@@ -4,12 +4,12 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import config_validation as cv
-from homeassistant.const import CONF_API_KEY, CONF_API_URL, CONF_NAME
 from homeassistant.components import websocket_api
 from homeassistant.helpers.translation import gettext as _
 
-from .const import DOMAIN
+from .const import DOMAIN, CONF_API_KEY, CONF_API_URL, CONF_NAME
 
 _LOGGER = logging.getLogger(__name__)
 
