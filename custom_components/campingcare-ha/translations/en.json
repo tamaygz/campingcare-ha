@@ -10,5 +10,35 @@
         }
       }
     }
+  },
+  "options": {
+    "title": "CampingCare Settings",
+    "api_key": "API Key",
+    "api_url": "API URL"
+  },
+  "service": {
+    "query_plate": {
+      "description": "Query guest data by license plate."
+    }
+  },
+  "errors": {
+    "api_connection_failed": "Failed to connect to the API. Please check your API key and URL.",
+    "invalid_license_plate": "Invalid license plate provided. Please check the format.",
+    "api_request_failed": "Error while querying the API. Please try again later."
+  },
+  "websocket": {
+    "query_license_plate": {
+      "description": "Query guest information based on the license plate.",
+      "error": {
+        "missing_plate": "Missing license plate in the request. Please provide a valid plate."
+      }
+    }
+  },
+  "common": {
+    "name": "CampingCare",
+    "setup": {
+      "title": "Setup the CampingCare Integration",
+      "message": "Provide the required API key and URL to connect to the CampingCare service."
+    }
   }
 }
