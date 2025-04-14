@@ -1,15 +1,14 @@
 {
-    "config": {
-      "step": {
-        "user": {
-          "title": "CampingCare LPR",
-          "description": "Connect to the CampingCare API to look up guests by license plate.",
-          "data": {
-            "api_key": "API Key",
-            "api_url": "API URL (optional)"
-          }
+  "config_flow": {
+    "step": {
+      "user": {
+        "title": "Add CampingCare Integration",
+        "data": {
+          "name": "Account Name",
+          "api_key": "API Key",
+          "api_url": "API URL"
         }
       }
     }
   }
-  
+}

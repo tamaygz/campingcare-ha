@@ -15,13 +15,13 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    """Set up CampingCare from a config entry."""
+    """Set up one CampingCare instance from a config entry."""
     hass.data.setdefault(DOMAIN, {})
 
-    # Store entry config for later access
     hass.data[DOMAIN][entry.entry_id] = {
+        CONF_NAME: entry.data[CONF_NAME],
         CONF_API_KEY: entry.data[CONF_API_KEY],
-        CONF_API_URL: entry.data.get(CONF_API_URL),
+        CONF_API_URL: entry.data[CONF_API_URL],
     }
 
     async def handle_query_plate(call: ServiceCall):

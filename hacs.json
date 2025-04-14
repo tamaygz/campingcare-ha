@@ -1,10 +1,9 @@
 {
-    "name": "CampingCare Integration",
-    "content_in_root": false,
-    "domains": ["campingcare-ha"],
-    "country": "DE",
-    "homeassistant": "2024.4.0",
-    "iot_class": "cloud_polling",
-    "render_readme": true
-  }
-  
+  "name": "CampingCare Integration",
+  "content_in_root": false,
+  "domains": ["campingcare-ha"],
+  "country": "DE",
+  "homeassistant": "2024.4.0",
+  "iot_class": "cloud_polling",
+  "render_readme": true
+}

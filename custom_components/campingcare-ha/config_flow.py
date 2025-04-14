@@ -1,11 +1,10 @@
 from homeassistant import config_entries
-from homeassistant.core import callback
 import voluptuous as vol
+from .const import DOMAIN, CONF_API_KEY, CONF_API_URL, CONF_NAME
 
-from .const import DOMAIN, CONF_API_KEY, CONF_API_URL, DEFAULT_API_URL
 
 class CampingCareConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle the config flow."""
+    """Handle a config flow for CampingCare."""
 
     VERSION = 1
 
@@ -13,13 +12,22 @@ class CampingCareConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
 
         if user_input is not None:
-            return self.async_create_entry(title="CampingCare", data=user_input)
+            await self.async_set_unique_id(f"{user_input[CONF_NAME]}")
+            self._abort_if_unique_id_configured()
+
+            return self.async_create_entry(
+                title=user_input[CONF_NAME],
+                data=user_input,
+            )
+
+        data_schema = vol.Schema({
+            vol.Required(CONF_NAME): str,
+            vol.Required(CONF_API_URL): str,
+            vol.Required(CONF_API_KEY): str,
+        })
 
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema({
-                vol.Required(CONF_API_KEY): str,
-                vol.Optional(CONF_API_URL, default=DEFAULT_API_URL): str,
-            }),
-            errors=errors,
+            data_schema=data_schema,
+            errors=errors
         )

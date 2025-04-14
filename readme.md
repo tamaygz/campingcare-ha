@@ -1,10 +1,8 @@
-# CampingCare Integration
+# CampingCare Home Assistant Integration
 
-This custom integration lets you connect your CampingCare backend to Home Assistant via license plate recognition.
+## Overview
+This integration allows you to connect to your CampingCare API to query guest information and booking data via license plate recognition.
 
-Features:
-- Script action to query guest by license plate
-- Optional automation triggers and guest detection
-- Custom API settings via UI config
-
-More features coming soon!
+## Installation via HACS:
+1. Add the repository to your HACS integration.
+2. Follow the setup instructions to configure the API key and base URL.
