@@ -5,7 +5,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
-from homeassistant.const import CONF_API_KEY, CONF_URL, CONF_NAME
+from homeassistant.const import CONF_API_KEY, CONF_API_URL, CONF_NAME
 from homeassistant.components import websocket_api
 from homeassistant.helpers.translation import gettext as _
 
@@ -18,7 +18,7 @@ CONFIG_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_NAME): cv.string,
         vol.Required(CONF_API_KEY): cv.string,
-        vol.Required(CONF_URL): cv.url,
+        vol.Required(CONF_API_URL): cv.url,
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -37,7 +37,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: config_entries.ConfigEnt
     _LOGGER.info(_("Setting up CampingCare for %s", entry.data[CONF_NAME]))
 
     api_key = entry.data[CONF_API_KEY]
-    url = entry.data[CONF_URL]
+    url = entry.data[CONF_API_URL]
     
     # Store the API connection in hass data for access later
     hass.data[DOMAIN] = {

@@ -1,7 +1,7 @@
 import logging
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
-from homeassistant.const import CONF_API_KEY, CONF_URL
+from homeassistant.const import CONF_API_KEY, CONF_API_URL
 import voluptuous as vol
 from .const import DOMAIN
 
@@ -15,14 +15,14 @@ class CampingCareConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             # Here you can validate the API key and URL
             api_key = user_input[CONF_API_KEY]
-            url = user_input[CONF_URL]
+            url = user_input[CONF_API_URL]
 
             # If validation succeeds, create a config entry
             return self.async_create_entry(
                 title="CampingCare Integration",
                 data={
                     CONF_API_KEY: api_key,
-                    CONF_URL: url
+                    CONF_API_URL: url
                 }
             )
 
@@ -38,5 +38,5 @@ class CampingCareConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         return vol.Schema({
             vol.Required(CONF_API_KEY): str,
-            vol.Required(CONF_URL): str,
+            vol.Required(CONF_API_URL): str,
         })
