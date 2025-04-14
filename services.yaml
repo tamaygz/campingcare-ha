@@ -1,0 +1,11 @@
+query_plate:
+  name: Query Plate
+  description: Query the CampingCare API with a license plate.
+  fields:
+    plate:
+      name: License Plate
+      description: License plate to look up.
+      required: true
+      example: AB123CD
+      selector:
+        text:

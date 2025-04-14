@@ -1,0 +1,10 @@
+{
+    "domain": "campingcare-ha",
+    "name": "CampingCare HA",
+    "version": "1.0.0",
+    "requirements": ["requests"],
+    "codeowners": ["@tamaygz"],
+    "iot_class": "cloud_polling",
+    "config_flow": true
+  }
+  
