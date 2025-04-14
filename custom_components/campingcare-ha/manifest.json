@@ -1,7 +1,7 @@
 {
     "domain": "campingcare-ha",
     "name": "CampingCare HA",
-    "version": "1.1.2",
+    "version": "1.1.3",
     "requirements": ["requests"],
     "dependencies": [],
     "codeowners": ["@tamaygz"],
