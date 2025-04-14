@@ -32,17 +32,20 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
     return await async_setup_entry(hass, config[DOMAIN])
 
-async def async_setup_entry(hass: HomeAssistant, entry: config_entries.ConfigEntry):
+async def async_setup_entry(hass: HomeAssistant, entry: entry.ConfigEntry):
     """Set up CampingCare from a config entry."""
     _LOGGER.info(_("Setting up CampingCare for %s", entry.data[CONF_NAME]))
 
+    name = entry.data[CONF_NAME]
     api_key = entry.data[CONF_API_KEY]
     url = entry.data[CONF_API_URL]
-    
-    # Store the API connection in hass data for access later
-    hass.data[DOMAIN] = {
-        "api_key": api_key,
-        "url": url,
+
+    hass.data.setdefault(DOMAIN, {})
+
+    hass.data[DOMAIN][entry.entry_id] = {
+        CONF_NAME: name,
+        CONF_API_KEY: api_key,
+        CONF_API_URL: url,
     }
 
     # Make an initial API call to verify credentials

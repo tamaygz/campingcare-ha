@@ -1,7 +1,7 @@
 import logging
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
-from homeassistant.const import CONF_API_KEY, CONF_API_URL
+from homeassistant.const import CONF_NAME, CONF_API_KEY, CONF_API_URL
 import voluptuous as vol
 from .const import DOMAIN
 
@@ -12,31 +12,38 @@ class CampingCareConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step of the config flow."""
+
+        errors = {}
+
+
         if user_input is not None:
-            # Here you can validate the API key and URL
-            api_key = user_input[CONF_API_KEY]
-            url = user_input[CONF_API_URL]
+            await self.async_set_unique_id(f"{user_input[CONF_NAME]}")
+            self._abort_if_unique_id_configured()
 
             # If validation succeeds, create a config entry
             return self.async_create_entry(
-                title="CampingCare Integration",
-                data={
-                    CONF_API_KEY: api_key,
-                    CONF_API_URL: url
-                }
+                    title=user_input[CONF_NAME],
+                    data=user_input,
             )
+
+        data_schema = vol.Schema({
+            vol.Required(CONF_NAME): str,
+            vol.Required(CONF_API_URL): str,
+            vol.Required(CONF_API_KEY): str,
+        })
 
         # Show the form to the user
         return self.async_show_form(
             step_id="user",
-            data_schema=self._get_data_schema()
+            data_schema=data_schema,
+            errors=errors
         )
 
-    def _get_data_schema(self):
-        """Return the schema for the data input fields."""
-        from homeassistant.helpers import config_validation as cv
+    # def _get_data_schema(self):
+    #     """Return the schema for the data input fields."""
+    #     from homeassistant.helpers import config_validation as cv
 
-        return vol.Schema({
-            vol.Required(CONF_API_KEY): str,
-            vol.Required(CONF_API_URL): str,
-        })
+    #     return vol.Schema({
+    #         vol.Required(CONF_API_KEY): str,
+    #         vol.Required(CONF_API_URL): str,
+    #     })
