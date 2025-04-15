@@ -1,6 +1,18 @@
+check_plate:
+  name: Check Plate
+  description: Check if a license plate is valid using the CampingCare API.
+  fields:
+    plate:
+      name: License Plate
+      description: License plate to look up.
+      required: true
+      example: AB123CD
+      selector:
+        text:
+
 query_plate:
   name: Query Plate
-  description: Query the CampingCare API with a license plate.
+  description: Query the CampingCare API with a license plate and retrieve reservation details
   fields:
     plate:
       name: License Plate

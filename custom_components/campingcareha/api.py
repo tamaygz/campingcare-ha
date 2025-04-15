@@ -60,7 +60,7 @@ class CampingCareAPI:
             _LOGGER.error("CampingCareAPI: API request failed: %s", e)
             return {"success": False, "error": str(e)}
         
-    async def search_license_plate(self, plate: str) -> dict:
+    async def query_license_plate(self, plate: str) -> dict:
         """Search for a license plate and retrieve the associated reservation."""
         try:
             async with ClientSession() as session:

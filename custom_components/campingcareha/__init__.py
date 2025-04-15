@@ -53,6 +53,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         f"{DOMAIN}/query_license_plate"
     )
 
+    async def handle_check_plate(call: ServiceCall):
+        """Handle the check_plate service."""
+        plate = call.data.get("plate")
+        entry_id = list(hass.data[DOMAIN].keys())[0] if hass.data[DOMAIN] else None
+
+        if not entry_id:
+            _LOGGER.error("No valid CampingCareHA entry found.")
+            return
+
+        api_client = hass.data[DOMAIN][entry_id]["api_client"]
+        result = await api_client.check_license_plate(plate)
+
+        if result["success"]:
+            _LOGGER.info("CampingCareHA: Plate %s is valid: %s", plate, result["data"])
+        else:
+            _LOGGER.warning("CampingCareHA: Plate %s check failed: %s", plate, result["error"])
+    
     async def handle_query_plate(call: ServiceCall):
         """Handle the query_plate service."""
         plate = call.data.get("plate")
@@ -63,7 +80,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             return
 
         api_client = hass.data[DOMAIN][entry_id]["api_client"]
-        result = await api_client.check_license_plate(plate)
+        result = await api_client.query_license_plate(plate)
 
         if result["success"]:
             _LOGGER.info("CampingCareHA: Plate %s is valid: %s", plate, result["data"])
