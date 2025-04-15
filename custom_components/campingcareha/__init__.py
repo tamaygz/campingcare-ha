@@ -31,7 +31,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up CampingCareHA from a config entry."""
-    _LOGGER.info("Setting up CampingCareHA for %s", entry.data[CONF_NAME])
+    _LOGGER.info("Setting up CampingCareHA for %s", entry)
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = {
