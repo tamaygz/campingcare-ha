@@ -12,9 +12,28 @@
     }
   },
   "options": {
-    "title": "CampingCare Settings",
-    "api_key": "API Key",
-    "api_url": "API URL"
+    "step": {
+      "init": {
+        "title": "Update CampingCare Settings",
+        "data": {
+          "name": "Account Name",
+          "api_url": "API URL",
+          "api_key": "API Key"
+        }
+      }
+    }
+  },
+  "options_flow": {
+    "step": {
+      "init": {
+        "title": "Update CampingCare Settings",
+        "data": {
+          "name": "Account Name",
+          "api_url": "API URL",
+          "api_key": "API Key"
+        }
+      }
+    }
   },
   "service": {
     "query_plate": {
