@@ -1,12 +1,13 @@
 import logging
 import voluptuous as vol
 
-from homeassistant import config_entries  # Ensure Home Assistant is installed in your environment
+from homeassistant import config_entries
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.components import websocket_api
+from homeassistant.helpers.event import async_call_later  # Import async_call_later directly
 
 from .const import DOMAIN, CONF_API_KEY, CONF_API_URL, CONF_NAME
 
@@ -22,8 +23,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     async def handle_query_plate(call: ServiceCall):
         """Handle the query_plate service."""
         plate = call.data.get("plate")
-        # Add logic to query the CampingCare API with the plate
-        hass.helpers.event.async_call_later(0, lambda: _LOGGER.info(f"Queried plate: {plate}"))
+        # Log the queried plate
+        async_call_later(hass, 0, lambda _: _LOGGER.info(f"Queried plate: {plate}"))
 
     # Register the service
     hass.services.async_register(
