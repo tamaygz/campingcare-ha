@@ -2,9 +2,10 @@ import logging
 import voluptuous as vol
 
 from homeassistant import config_entries  # Ensure Home Assistant is installed in your environment
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.typing import ConfigType
 from homeassistant.components import websocket_api
 
 from .const import DOMAIN, CONF_API_KEY, CONF_API_URL, CONF_NAME
@@ -14,9 +15,26 @@ from aiohttp.web_exceptions import HTTPBadRequest
 
 _LOGGER = logging.getLogger(__name__)
 
-async def async_setup(hass: HomeAssistant, config: dict):
-    """Set up CampingCareHA integration from YAML (unused)."""
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Set up the CampingCare integration."""
     _LOGGER.info("CampingCareHA: async_setup called — skipping YAML config.")
+
+    async def handle_query_plate(call: ServiceCall):
+        """Handle the query_plate service."""
+        plate = call.data.get("plate")
+        # Add logic to query the CampingCare API with the plate
+        hass.helpers.event.async_call_later(0, lambda: _LOGGER.info(f"Queried plate: {plate}"))
+
+    # Register the service
+    hass.services.async_register(
+        domain="campingcareha",
+        service="query_plate",
+        service_func=handle_query_plate,
+        schema=vol.Schema({
+            vol.Required("plate"): str,
+        }),
+    )
+
     return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
