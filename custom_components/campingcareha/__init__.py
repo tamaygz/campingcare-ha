@@ -37,6 +37,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         }
 
         # Call the existing WebSocket method
+        _LOGGER.debug("Calling websocket_query_license_plate with plate: %s", plate)
         await websocket_query_license_plate(hass, None, msg)
 
     # Register the service
@@ -98,6 +99,9 @@ async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):
     """Handle WebSocket license plate lookup."""
     plate = msg.get("plate")
     entry_id = msg.get("entry_id")
+    
+    # Log the entry_id for debugging
+    _LOGGER.debug("WebSocket query_license_plate called with plate: %s", plate)
 
     if not plate or not entry_id or entry_id not in hass.data[DOMAIN]:
         if connection:
