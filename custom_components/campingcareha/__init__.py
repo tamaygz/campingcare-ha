@@ -10,6 +10,7 @@ from homeassistant.components import websocket_api
 from homeassistant.helpers.event import async_call_later  # Import async_call_later directly
 
 from .const import DOMAIN, CONF_API_KEY, CONF_API_URL, CONF_NAME
+from .options_flow import CampingCareOptionsFlowHandler
 
 from aiohttp import ClientError, ClientConnectionError, ClientSession, InvalidURL, web, web_response
 from aiohttp.web_exceptions import HTTPBadRequest
@@ -54,18 +55,23 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up CampingCareHA from a config entry."""
-    _LOGGER.info("Setting up CampingCareHA for %s", entry)
+    _LOGGER.info("Setting up CampingCareHA for '%s'", entry.data[CONF_NAME])
 
     hass.data.setdefault(DOMAIN, {})
+
+    # Use updated values from options if available
+    api_key = entry.options.get(CONF_API_KEY, entry.data[CONF_API_KEY])
+    api_url = entry.options.get(CONF_API_URL, entry.data[CONF_API_URL])
+    name = entry.options.get(CONF_NAME, entry.data[CONF_NAME])
+
     hass.data[DOMAIN][entry.entry_id] = {
-        CONF_NAME: entry.data[CONF_NAME],
-        CONF_API_KEY: entry.data[CONF_API_KEY],
-        CONF_API_URL: entry.data[CONF_API_URL],
+        CONF_NAME: name,
+        CONF_API_KEY: api_key,
+        CONF_API_URL: api_url,
     }
 
-    # Validate API connection
-    if not await test_api_connection(entry.data[CONF_API_URL], entry.data[CONF_API_KEY]):
-        _LOGGER.error("CampingCareHA API connection failed.")
+    if not await test_api_connection(api_url, api_key):
+        _LOGGER.error("CampingCareHA: API test failed for '%s'", name)
         return False
 
     websocket_api.async_register_command(
@@ -81,6 +87,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN].pop(entry.entry_id, None)
     _LOGGER.info("Unloaded CampingCareHA entry '%s'", entry.entry_id)
     return True
+
+async def async_get_options_flow(config_entry: ConfigEntry):
+    """Return the options flow handler."""
+    return CampingCareOptionsFlowHandler(config_entry)
+
 
 async def test_api_connection(url: str, api_key: str):
     """Test the API connection."""
