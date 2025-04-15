@@ -1,16 +1,17 @@
 import logging
-from homeassistant import config_entries
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.const import CONF_NAME, CONF_API_KEY, CONF_API_URL
+from homeassistant.data_entry_flow import FlowResult
+from .const import DOMAIN, CONF_NAME, CONF_API_KEY, CONF_API_URL
 import voluptuous as vol
-from .const import DOMAIN
+
 
 _LOGGER = logging.getLogger(__name__)
 
-class CampingCareConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class CampingCareConfigFlow(ConfigEntry, domain=DOMAIN):
     """Handle a config flow for CampingCare."""
 
-    async def async_step_user(self, user_input=None):
+    async def async_step_user(self, user_input=None) -> FlowResult:
         """Handle the initial step of the config flow."""
 
         errors = {}

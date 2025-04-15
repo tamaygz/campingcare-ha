@@ -2,7 +2,7 @@ import logging
 import requests
 import voluptuous as vol
 
-from homeassistant import config_entries
+from homeassistant import config_entries  # Ensure Home Assistant is installed in your environment
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import config_validation as cv
@@ -24,16 +24,16 @@ CONFIG_SCHEMA = vol.Schema(
 
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the CampingCare integration."""
-    _LOGGER.info(_("Setting up CampingCare integration"))
+    _LOGGER.info("Setting up CampingCare integration")
 
     if DOMAIN not in config:
         return True
 
     return await async_setup_entry(hass, config[DOMAIN])
 
-async def async_setup_entry(hass: HomeAssistant, entry: entry.ConfigEntry):
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up CampingCare from a config entry."""
-    _LOGGER.info(_("Setting up CampingCare for %s", entry.data[CONF_NAME]))
+    _LOGGER.info("Setting up CampingCare for %s", entry.data[CONF_NAME])
 
     name = entry.data[CONF_NAME]
     api_key = entry.data[CONF_API_KEY]
@@ -49,7 +49,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: entry.ConfigEntry):
 
     # Make an initial API call to verify credentials
     if not await test_api_connection(url, api_key):
-        _LOGGER.error(_("API connection failed for %s", entry.data[CONF_NAME]))
+        _LOGGER.error("API connection failed for %s", entry.data[CONF_NAME])
         return False
 
     # Add a websocket command for querying the license plate
@@ -64,13 +64,13 @@ async def test_api_connection(url: str, api_key: str):
     try:
         response = requests.get(f"{url}/v1/test", headers={"Authorization": f"Bearer {api_key}"})
         if response.status_code == 200:
-            _LOGGER.info(_("Successfully connected to the CampingCare API"))
+            _LOGGER.info("Successfully connected to the CampingCare API")
             return True
         else:
-            _LOGGER.error(_("Failed to connect to the API. Status code: %s", response.status_code))
+            _LOGGER.error("Failed to connect to the API. Status code: %s", response.status_code)
             return False
     except requests.exceptions.RequestException as e:
-        _LOGGER.error(_("Error connecting to the API: %s", str(e)))
+        _LOGGER.error("Error connecting to the API: %s", str(e))
         return False
 
 async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):

@@ -1,4 +1,4 @@
-DOMAIN = "campingcare-ha"
+DOMAIN = "campingcareha"
 
 CONF_API_KEY = "api_key"
 CONF_API_URL = "api_url"
