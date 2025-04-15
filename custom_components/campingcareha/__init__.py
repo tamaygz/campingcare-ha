@@ -26,7 +26,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up CampingCareHA from a config entry."""
-    _LOGGER.info("Setting up CampingCareHA for '%s'", entry.data[CONF_NAME])
 
     hass.data.setdefault(DOMAIN, {})
 
@@ -34,6 +33,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     api_key = entry.options.get(CONF_API_KEY, entry.data[CONF_API_KEY])
     api_url = entry.options.get(CONF_API_URL, entry.data[CONF_API_URL])
     name = entry.options.get(CONF_NAME, entry.data[CONF_NAME])
+
+    _LOGGER.info("Setting up CampingCareHA for '%s'", name)
 
     hass.data[DOMAIN][entry.entry_id] = {
         CONF_NAME: name,
