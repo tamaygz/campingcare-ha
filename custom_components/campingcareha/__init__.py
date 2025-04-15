@@ -81,7 +81,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             vol.Required("plate"): str,
         }),
     )
-    
+
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -93,7 +93,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_get_options_flow(config_entry: ConfigEntry):
     """Return the options flow handler."""
     return CampingCareOptionsFlowHandler(config_entry)
-
 
 async def test_api_connection(url: str, api_key: str):
     """Test the API connection."""
