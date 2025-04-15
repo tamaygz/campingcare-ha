@@ -73,11 +73,19 @@ class CampingCareAPI:
                     if response.status == 200:
                         data = await response.json()
                         _LOGGER.debug("CampingCareAPI: License plate search successful: %s", data)
-                        if data.get("count", 0) > 0:
-                            return {"success": True, "data": data["results"]}
-                        else:
-                            _LOGGER.warning("CampingCareAPI: No reservation found for plate: %s", plate)
-                            return {"success": False, "error": "No reservation found"}
+                        
+                        # Check if the response is a list
+                        if isinstance(data, list):
+                            if len(data) > 0:
+                                return {"success": True, "data": data}
+                            else:
+                                _LOGGER.warning("CampingCareAPI: No reservation found for plate: %s", plate)
+                                return {"success": False, "error": "No reservation found"}
+                        
+                        # Handle unexpected response formats
+                        _LOGGER.error("CampingCareAPI: Unexpected response format: %s", data)
+                        return {"success": False, "error": "Unexpected response format"}
+                    
                     elif response.status == 404:
                         _LOGGER.warning("CampingCareAPI: No reservation found for plate: %s", plate)
                         return {"success": False, "error": "No reservation found"}
