@@ -101,7 +101,8 @@ async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):
     entry_id = msg.get("entry_id")
     
     # Log the entry_id for debugging
-    _LOGGER.debug("WebSocket query_license_plate called with plate: %s", plate)
+    _LOGGER.debug("CampingCareHA: config entry id: %s", entry_id)
+    _LOGGER.debug("CampingCareHA: WebSocket query_license_plate called with plate: %s", plate)
 
     if not plate or not entry_id or entry_id not in hass.data[DOMAIN]:
         if connection:
@@ -111,6 +112,7 @@ async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):
     config = hass.data[DOMAIN][entry_id]
     url = config[CONF_API_URL]
     api_key = config[CONF_API_KEY]
+    _LOGGER.debug("CampingCareHA: trying on %s with key %s ", url, api_key)
 
     try:
         async with ClientSession() as session:
@@ -118,8 +120,11 @@ async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):
                 f"{url}/license_plates/check_plate?plate={plate}",
                 headers={"Authorization": f"Bearer {api_key}"}
             ) as response:
+                _LOGGER.debug("CampingCareHA: response: %s", response)
+                
                 if response.status == 200:
                     data = await response.json()
+                    _LOGGER.debug("CampingCareHA: response data: %s", data)
                     if connection:
                         connection.send_message({
                             "id": msg["id"],
