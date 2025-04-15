@@ -86,8 +86,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             _LOGGER.info("CampingCareHA: Plate %s is valid: %s", plate, result["data"])
         else:
             _LOGGER.warning("CampingCareHA: Plate %s check failed: %s", plate, result["error"])
+    
+    # Register the services
+    hass.services.async_register(
+        domain="campingcareha",
+        service="check_plate",
+        service_func=handle_check_plate,
+        schema=vol.Schema({
+            vol.Required("plate"): str,
+        }),
+    )
 
-    # Register the service
     hass.services.async_register(
         domain="campingcareha",
         service="query_plate",
