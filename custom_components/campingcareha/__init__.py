@@ -85,7 +85,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     hass.data[DOMAIN].pop(entry.entry_id, None)
-    hass.components.websocket_api.async_unregister_command(f"{DOMAIN}/query_license_plate")
     _LOGGER.info("Unloaded CampingCareHA entry '%s'", entry.entry_id)
     return True
 
