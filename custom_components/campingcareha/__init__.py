@@ -23,8 +23,21 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     async def handle_query_plate(call: ServiceCall):
         """Handle the query_plate service."""
         plate = call.data.get("plate")
-        # Log the queried plate
-        async_call_later(hass, 0, lambda _: _LOGGER.info(f"Queried plate: {plate}"))
+        entry_id = list(hass.data[DOMAIN].keys())[0] if hass.data[DOMAIN] else None
+
+        if not entry_id:
+            _LOGGER.error("No valid CampingCareHA entry found.")
+            return
+
+        # Create a mock WebSocket message
+        msg = {
+            "id": "service_call",  # Use a placeholder ID
+            "plate": plate,
+            "entry_id": entry_id,
+        }
+
+        # Call the existing WebSocket method
+        await websocket_query_license_plate(hass, None, msg)
 
     # Register the service
     hass.services.async_register(
@@ -87,7 +100,8 @@ async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):
     entry_id = msg.get("entry_id")
 
     if not plate or not entry_id or entry_id not in hass.data[DOMAIN]:
-        connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "Missing or invalid plate/entry_id")
+        if connection:
+            connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "Missing or invalid plate/entry_id")
         return
 
     config = hass.data[DOMAIN][entry_id]
@@ -102,14 +116,17 @@ async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):
             ) as response:
                 if response.status == 200:
                     data = await response.json()
-                    connection.send_message({
-                        "id": msg["id"],
-                        "type": "result",
-                        "success": True,
-                        "result": data
-                    })
+                    if connection:
+                        connection.send_message({
+                            "id": msg["id"],
+                            "type": "result",
+                            "success": True,
+                            "result": data
+                        })
                 else:
-                    connection.send_error(msg["id"], "api_error", f"API error: {response.status}")
+                    if connection:
+                        connection.send_error(msg["id"], "api_error", f"API error: {response.status}")
     except ClientError as e:
         _LOGGER.error("API request failed: %s", e)
-        connection.send_error(msg["id"], "api_exception", str(e))
+        if connection:
+            connection.send_error(msg["id"], "api_exception", str(e))
