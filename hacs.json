@@ -1,5 +1,5 @@
 {
-  "name": "CampingCare Integration",
+  "name": "CampingCare HA Integration",
   "content_in_root": false,
   "domains": ["campingcareha"],
   "country": "DE",

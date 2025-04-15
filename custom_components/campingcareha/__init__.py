@@ -25,13 +25,13 @@ CONFIG_SCHEMA = vol.Schema(
 )
 
 async def async_setup(hass: HomeAssistant, config: dict):
-    """Set up the CampingCare integration from YAML (currently unused)."""
-    _LOGGER.info("CampingCare: async_setup called — skipping YAML config.")
+    """Set up CampingCareHA integration from YAML (unused)."""
+    _LOGGER.info("CampingCareHA: async_setup called — skipping YAML config.")
     return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    """Set up CampingCare from a config entry."""
-    _LOGGER.info("Setting up CampingCare for %s", entry.data[CONF_NAME])
+    """Set up CampingCareHA from a config entry."""
+    _LOGGER.info("Setting up CampingCareHA for %s", entry.data[CONF_NAME])
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = {
@@ -42,13 +42,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     # Validate API connection
     if not await test_api_connection(entry.data[CONF_API_URL], entry.data[CONF_API_KEY]):
-        _LOGGER.error("API connection failed for %s", entry.data[CONF_NAME])
+        _LOGGER.error("CampingCareHA API connection failed.")
         return False
 
     websocket_api.async_register_command(
         hass,
         websocket_query_license_plate,
-        "campingcare/query_license_plate"
+        "campingcareha/query_license_plate"
     )
 
     return True

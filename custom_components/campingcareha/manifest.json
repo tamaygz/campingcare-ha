@@ -2,10 +2,11 @@
     "domain": "campingcareha",
     "name": "CampingCare HA",
     "version": "1.1.4",
-    "requirements": ["requests"],
+    "config_flow": true,
+    "documentation": "https://github.com/tamaygz/campingcare-ha",
+    "requirements": [],
     "dependencies": [],
     "codeowners": ["@tamaygz"],
-    "iot_class": "cloud_polling",
-    "config_flow": true
+    "iot_class": "cloud_polling"
   }
   
