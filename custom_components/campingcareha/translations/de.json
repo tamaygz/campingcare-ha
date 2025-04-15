@@ -1,45 +1,44 @@
 {
-    "config_flow": {
-      "step": {
-        "user": {
-          "title": "CampingCare Integration hinzufügen",
-          "data": {
-            "name": "Kontoname",
-            "api_key": "API-Schlüssel",
-            "api_url": "API-URL"
-          }
+  "config_flow": {
+    "step": {
+      "user": {
+        "title": "CampingCare Integration hinzufügen",
+        "data": {
+          "name": "Kontoname",
+          "api_key": "API-Schlüssel",
+          "api_url": "API-URL"
         }
-      }
-    },
-    "options": {
-      "title": "CampingCare Einstellungen",
-      "api_key": "API-Schlüssel",
-      "api_url": "API-URL"
-    },
-    "service": {
-      "query_plate": {
-        "description": "Gästedaten anhand des Kennzeichens abfragen."
-      }
-    },
-    "errors": {
-      "api_connection_failed": "Verbindung zur API fehlgeschlagen. Bitte überprüfen Sie Ihren API-Schlüssel und die URL.",
-      "invalid_license_plate": "Ungültiges Kennzeichen angegeben. Bitte überprüfen Sie das Format.",
-      "api_request_failed": "Fehler bei der Abfrage der API. Bitte versuchen Sie es später erneut."
-    },
-    "websocket": {
-      "query_license_plate": {
-        "description": "Gästedaten basierend auf dem Kennzeichen abfragen.",
-        "error": {
-          "missing_plate": "Kennzeichen fehlt in der Anfrage. Bitte geben Sie ein gültiges Kennzeichen an."
-        }
-      }
-    },
-    "common": {
-      "name": "CampingCare",
-      "setup": {
-        "title": "CampingCare Integration einrichten",
-        "message": "Geben Sie den erforderlichen API-Schlüssel und die URL ein, um eine Verbindung zum CampingCare-Service herzustellen."
       }
     }
+  },
+  "options": {
+    "title": "CampingCare Einstellungen",
+    "api_key": "API-Schlüssel",
+    "api_url": "API-URL"
+  },
+  "service": {
+    "query_plate": {
+      "description": "Gästedaten anhand des Kennzeichens abfragen."
+    }
+  },
+  "errors": {
+    "api_connection_failed": "Verbindung zur API fehlgeschlagen. Bitte überprüfen Sie Ihren API-Schlüssel und die URL.",
+    "invalid_license_plate": "Ungültiges Kennzeichen angegeben. Bitte überprüfen Sie das Format.",
+    "api_request_failed": "Fehler bei der Abfrage der API. Bitte versuchen Sie es später erneut."
+  },
+  "websocket": {
+    "query_license_plate": {
+      "description": "Gästedaten basierend auf dem Kennzeichen abfragen.",
+      "error": {
+        "missing_plate": "Kennzeichen fehlt in der Anfrage. Bitte geben Sie ein gültiges Kennzeichen an."
+      }
+    }
+  },
+  "common": {
+    "name": "CampingCare",
+    "setup": {
+      "title": "CampingCare Integration einrichten",
+      "message": "Geben Sie den erforderlichen API-Schlüssel und die URL ein, um eine Verbindung zum CampingCare-Service herzustellen."
+    }
   }
-  
+}
