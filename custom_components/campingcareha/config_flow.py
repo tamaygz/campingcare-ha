@@ -13,7 +13,7 @@ from .const import (DOMAIN, CONF_NAME, CONF_API_KEY, CONF_API_URL, DEFAULT_API_U
 
 class CampingCareConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for CampingCare HA."""
-    VERSION = 2
+    VERSION = 1
 
     async def async_step_user(self, user_input=None) -> ConfigFlowResult:
         """Handle the initial step of the config flow."""       
