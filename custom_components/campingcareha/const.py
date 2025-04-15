@@ -19,8 +19,10 @@ class ApiTopics(StrEnum):
 class ApiQuery(StrEnum):
     """API query parameters for Camping Care."""
     PLATE = "plate={plate}"  # Query parameter for license plate
+    LICENSE_PLATE = "license_plate={plate}"  # Query parameter for license plate in search
 
 class ApiEndpoints(StrEnum):
     """API endpoints for Camping Care."""
+    FIND_LICENSE_PLATE_AND_GET_RESERVATION = ApiTopics.LICENSE_PLATES + "?" + ApiQuery.LICENSE_PLATE + "&get_reservation=true"  # Search for a license plate and retrieve the associated reservation
     CHECK_LICENSE_PLATE = ApiTopics.LICENSE_PLATES + "/check_plate?" + ApiQuery.PLATE  # Check if a license plate is valid
     GET_API_VERSION = ApiTopics.VERSION  # Get the API version

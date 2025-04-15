@@ -59,3 +59,31 @@ class CampingCareAPI:
         except ClientError as e:
             _LOGGER.error("CampingCareAPI: API request failed: %s", e)
             return {"success": False, "error": str(e)}
+        
+    async def search_license_plate(self, plate: str) -> dict:
+        """Search for a license plate and retrieve the associated reservation."""
+        try:
+            async with ClientSession() as session:
+                # Construct the endpoint with query parameters
+                endpoint = f"{self.api_url}{ApiEndpoints.FIND_LICENSE_PLATE_AND_GET_RESERVATION.format(plate=plate)}"
+                async with session.get(
+                    endpoint,
+                    headers={"Authorization": f"Bearer {self.api_key}"}
+                ) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        _LOGGER.debug("CampingCareAPI: License plate search successful: %s", data)
+                        if data.get("count", 0) > 0:
+                            return {"success": True, "data": data["results"]}
+                        else:
+                            _LOGGER.warning("CampingCareAPI: No reservation found for plate: %s", plate)
+                            return {"success": False, "error": "No reservation found"}
+                    elif response.status == 404:
+                        _LOGGER.warning("CampingCareAPI: No reservation found for plate: %s", plate)
+                        return {"success": False, "error": "No reservation found"}
+                    else:
+                        _LOGGER.error("CampingCareAPI: API error: %s", response.status)
+                        return {"success": False, "error": f"API error: {response.status}"}
+        except ClientError as e:
+            _LOGGER.error("CampingCareAPI: API request failed: %s", e)
+            return {"success": False, "error": str(e)}
