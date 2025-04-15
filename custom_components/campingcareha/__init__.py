@@ -83,6 +83,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         result = await api_client.query_license_plate(plate)
 
         if result["success"]:
+            hass.bus.async_fire(
+                f"{DOMAIN}_query_license_plate",
+                {
+                    "entry_id": entry_id,
+                    "plate": plate,
+                    "result": result["data"],
+                }
+            )
             _LOGGER.info("CampingCareHA: Plate %s is valid: %s", plate, result["data"])
         else:
             _LOGGER.warning("CampingCareHA: Plate %s check failed: %s", plate, result["error"])
