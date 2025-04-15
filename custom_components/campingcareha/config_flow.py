@@ -49,10 +49,6 @@ class CampingCareConfigFlow(ConfigFlow, domain=DOMAIN):
 class CampingCareOptionsFlowHandler(OptionsFlow):
     """Handle CampingCareHA options."""
 
-    # def __init__(self, config_entry: ConfigEntry) -> None:
-    #     """Initialize options flow."""
-    #     self.config_entry = config_entry
-
     async def async_step_init(self, user_input=None) -> ConfigFlowResult:
         """Manage the CampingCareHA options."""
         if user_input is not None:
@@ -68,11 +64,16 @@ class CampingCareOptionsFlowHandler(OptionsFlow):
 
             return self.async_create_entry(data=user_input)
 
+        # Prefer options if present, otherwise use the original config entry data
+        name = self.config_entry.options.get(CONF_NAME, self.config_entry.data.get(CONF_NAME))
+        api_url = self.config_entry.options.get(CONF_API_URL, self.config_entry.data.get(CONF_API_URL))
+        api_key = self.config_entry.options.get(CONF_API_KEY, self.config_entry.data.get(CONF_API_KEY))
+
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
-                vol.Required(CONF_NAME, default=self.config_entry.data.get(CONF_NAME)): str,
-                vol.Required(CONF_API_URL, default=self.config_entry.data.get(CONF_API_URL, DEFAULT_API_URL)): str,
-                vol.Required(CONF_API_KEY, default=self.config_entry.data.get(CONF_API_KEY)): str,
+                vol.Required(CONF_NAME, default=name): str,
+                vol.Required(CONF_API_URL, default=api_url): str,
+                vol.Required(CONF_API_KEY, default=api_key): str,
             })
         )
