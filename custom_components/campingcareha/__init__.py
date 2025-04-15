@@ -1,5 +1,4 @@
 import logging
-import requests
 import voluptuous as vol
 
 from homeassistant import config_entries  # Ensure Home Assistant is installed in your environment
@@ -9,6 +8,9 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.components import websocket_api
 
 from .const import DOMAIN, CONF_API_KEY, CONF_API_URL, CONF_NAME
+
+from aiohttp import ClientConnectionError, ClientSession, InvalidURL, web, web_response
+from aiohttp.web_exceptions import HTTPBadRequest
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -62,14 +64,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 async def test_api_connection(url: str, api_key: str):
     """Test the API connection to ensure it's working."""
     try:
-        response = requests.get(f"{url}/v1/test", headers={"Authorization": f"Bearer {api_key}"})
-        if response.status_code == 200:
-            _LOGGER.info("Successfully connected to the CampingCare API")
-            return True
-        else:
-            _LOGGER.error("Failed to connect to the API. Status code: %s", response.status_code)
-            return False
-    except requests.exceptions.RequestException as e:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{url}/v1/test", headers={"Authorization": f"Bearer {api_key}"}) as response:
+                if response.status == 200:
+                    _LOGGER.info("Successfully connected to the CampingCare API")
+                    return True
+                else:
+                    _LOGGER.error("Failed to connect to the API. Status code: %s", response.status)
+                    return False
+    except aiohttp.ClientError as e:
         _LOGGER.error("Error connecting to the API: %s", str(e))
         return False
 
@@ -83,21 +86,21 @@ async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):
         return
 
     # Retrieve the stored API data
-    url = hass.data[DOMAIN]["url"]
-    api_key = hass.data[DOMAIN]["api_key"]
+    url = hass.data[DOMAIN][msg["entry_id"]][CONF_API_URL]
+    api_key = hass.data[DOMAIN][msg["entry_id"]][CONF_API_KEY]
 
     # Make the API call to fetch guest data by license plate
     try:
-        response = requests.get(f"{url}/v1/guests?plate={plate}", headers={"Authorization": f"Bearer {api_key}"})
-        if response.status_code == 200:
-            data = response.json()
-            connection.send_message({
-                "id": msg["id"],
-                "type": "result",
-                "data": data
-            })
-        else:
-            connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "Failed to retrieve data")
-    except requests.exceptions.RequestException as e:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{url}/v1/guests?plate={plate}", headers={"Authorization": f"Bearer {api_key}"}) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    connection.send_message({
+                        "id": msg["id"],
+                        "type": "result",
+                        "data": data
+                    })
+                else:
+                    connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "Failed to retrieve data")
+    except aiohttp.ClientError as e:
         connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, f"Error: {str(e)}")
-
