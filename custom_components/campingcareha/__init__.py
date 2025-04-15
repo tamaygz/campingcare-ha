@@ -1,7 +1,6 @@
 import logging
 import voluptuous as vol
 
-from homeassistant import config_entries
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import config_validation as cv
@@ -10,7 +9,7 @@ from homeassistant.components import websocket_api
 from homeassistant.helpers.event import async_call_later  # Import async_call_later directly
 
 from .const import DOMAIN, CONF_API_KEY, CONF_API_URL, CONF_NAME
-from .options_flow import CampingCareOptionsFlowHandler
+
 
 from aiohttp import ClientError, ClientConnectionError, ClientSession, InvalidURL, web, web_response
 from aiohttp.web_exceptions import HTTPBadRequest
@@ -90,9 +89,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     _LOGGER.info("Unloaded CampingCareHA entry '%s'", entry.entry_id)
     return True
 
-async def async_get_options_flow(config_entry: ConfigEntry):
-    """Return the options flow handler."""
-    return CampingCareOptionsFlowHandler(config_entry)
 
 async def test_api_connection(url: str, api_key: str):
     """Test the API connection."""
