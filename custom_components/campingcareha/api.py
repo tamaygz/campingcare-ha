@@ -1,5 +1,6 @@
 import logging
 from aiohttp import ClientSession, ClientError
+from .const import ApiEndpoints, ApiQuery
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ class CampingCareAPI:
         try:
             async with ClientSession() as session:
                 async with session.get(
-                    f"{self.api_url}/version",
+                    f"{self.api_url}{ApiEndpoints.GET_API_VERSION}",
                     headers={"Authorization": f"Bearer {self.api_key}"}
                 ) as response:
                     if response.status == 200:
@@ -45,7 +46,7 @@ class CampingCareAPI:
         try:
             async with ClientSession() as session:
                 async with session.get(
-                    f"{self.api_url}/license_plates/check_plate?plate={plate}",
+                    f"{self.api_url}{ApiEndpoints.CHECK_LICENSE_PLATE.format(plate=plate)}",
                     headers={"Authorization": f"Bearer {self.api_key}"}
                 ) as response:
                     if response.status == 200:
