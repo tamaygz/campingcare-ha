@@ -43,11 +43,7 @@ class CampingCareConfigFlow(ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
         """Return the options flow handler."""
-        return CampingCareOptionsFlowHandler()
-    
-    def async_get_entry_title(self, config_entry: ConfigEntry) -> str:
-        """Return the title for this config entry."""
-        return config_entry.options.get(CONF_NAME, config_entry.data[CONF_NAME])
+        return CampingCareOptionsFlowHandler()   
 
     
 class CampingCareOptionsFlowHandler(OptionsFlow):
@@ -63,7 +59,8 @@ class CampingCareOptionsFlowHandler(OptionsFlow):
             # Save new options
             self.hass.config_entries.async_update_entry(
                 self.config_entry,
-                options=user_input
+                options=user_input,
+                title=user_input[CONF_NAME],
             )
 
             # Trigger reload so UI reflects new title
