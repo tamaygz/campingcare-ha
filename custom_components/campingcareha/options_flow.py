@@ -6,7 +6,7 @@ from homeassistant.data_entry_flow import FlowResult
 from .const import (DOMAIN, CONF_API_KEY, CONF_API_URL, CONF_NAME, DEFAULT_API_URL)
 
 @config_entries.HANDLERS.register(DOMAIN)
-class CampingCareOptionsFlowHandler(config_entries.OptionsFlow, domain=DOMAIN):
+class CampingCareOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle CampingCareHA options."""
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
