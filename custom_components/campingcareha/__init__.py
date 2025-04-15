@@ -53,7 +53,7 @@ async def test_api_connection(url: str, api_key: str):
     """Test the API connection."""
     try:
         async with ClientSession() as session:
-            async with session.get(f"{url}/v1/version", headers={"Authorization": f"Bearer {api_key}"}) as response:
+            async with session.get(f"{url}/version", headers={"Authorization": f"Bearer {api_key}"}) as response:
                 if response.status == 200:
                     _LOGGER.debug("CampingCareHA: API test successful.")
                     return True
