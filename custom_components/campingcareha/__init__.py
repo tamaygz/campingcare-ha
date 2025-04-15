@@ -9,6 +9,7 @@ from homeassistant.components import websocket_api
 from homeassistant.helpers.event import async_call_later  # Import async_call_later directly
 
 from .const import DOMAIN, CONF_API_KEY, CONF_API_URL, CONF_NAME
+from .api import CampingCareAPI
 
 
 from aiohttp import ClientError, ClientConnectionError, ClientSession, InvalidURL, web, web_response
@@ -19,9 +20,6 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the CampingCare integration."""
     _LOGGER.info("CampingCareHA: async_setup called — skipping YAML config.")
-
-    
-
     return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
@@ -36,14 +34,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     _LOGGER.info("Setting up CampingCareHA for '%s'", name)
 
+    # Initialize the API client
+    api_client = CampingCareAPI(api_url, api_key)
+
     hass.data[DOMAIN][entry.entry_id] = {
         CONF_NAME: name,
-        CONF_API_KEY: api_key,
-        CONF_API_URL: api_url,
+        "api_client": api_client,
     }
 
-    if not await test_api_connection(api_url, api_key):
-        _LOGGER.error("CampingCareHA: API test failed for '%s'", name)
+    # Test the API connection
+    if not await api_client.test_connection():
+        _LOGGER.error("CampingCareHA: Failed to connect to the CampingCare API.")
         return False
 
     websocket_api.async_register_command(
@@ -61,16 +62,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             _LOGGER.error("No valid CampingCareHA entry found.")
             return
 
-        # Create a mock WebSocket message
-        msg = {
-            "id": "service_call",  # Use a placeholder ID
-            "plate": plate,
-            "entry_id": entry_id,
-        }
+        api_client = hass.data[DOMAIN][entry_id]["api_client"]
+        result = await api_client.check_license_plate(plate)
 
-        # Call the existing WebSocket method
-        _LOGGER.debug("Calling websocket_query_license_plate with plate: %s", plate)
-        await websocket_query_license_plate(hass, None, msg)
+        if result["success"]:
+            _LOGGER.info("CampingCareHA: Plate %s is valid: %s", plate, result["data"])
+        else:
+            _LOGGER.warning("CampingCareHA: Plate %s check failed: %s", plate, result["error"])
 
     # Register the service
     hass.services.async_register(
@@ -87,28 +85,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     hass.data[DOMAIN].pop(entry.entry_id, None)
+    hass.components.websocket_api.async_unregister_command(f"{DOMAIN}/query_license_plate")
     _LOGGER.info("Unloaded CampingCareHA entry '%s'", entry.entry_id)
     return True
-
-
-async def test_api_connection(url: str, api_key: str):
-    """Test the API connection."""
-    try:
-        async with ClientSession() as session:
-            async with session.get(f"{url}/version", headers={"Authorization": f"Bearer {api_key}"}) as response:
-                if response.status == 200:
-                    _LOGGER.debug("CampingCareHA: API test successful.")
-                    return True
-                _LOGGER.warning("CampingCareHA: API test returned status %s", response.status)
-    except ClientError as e:
-        _LOGGER.error("CampingCareHA: API test failed: %s", e)
-    return False
 
 async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):
     """Handle WebSocket license plate lookup."""
     plate = msg.get("plate")
     entry_id = msg.get("entry_id")
-    
+
     # Log the entry_id for debugging
     _LOGGER.debug("CampingCareHA: config entry id: %s", entry_id)
     _LOGGER.debug("CampingCareHA: WebSocket query_license_plate called with plate: %s", plate)
@@ -118,33 +103,80 @@ async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):
             connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "Missing or invalid plate/entry_id")
         return
 
-    config = hass.data[DOMAIN][entry_id]
-    url = config[CONF_API_URL]
-    api_key = config[CONF_API_KEY]
-    _LOGGER.debug("CampingCareHA: trying on %s with key %s ", url, api_key)
+    # Retrieve the API client
+    api_client = hass.data[DOMAIN][entry_id]["api_client"]
 
-    try:
-        async with ClientSession() as session:
-            async with session.get(
-                f"{url}/license_plates/check_plate?plate={plate}",
-                headers={"Authorization": f"Bearer {api_key}"}
-            ) as response:
-                _LOGGER.debug("CampingCareHA: response: %s", response)
-                
-                if response.status == 200:
-                    data = await response.json()
-                    _LOGGER.debug("CampingCareHA: response data: %s", data)
-                    if connection:
-                        connection.send_message({
-                            "id": msg["id"],
-                            "type": "result",
-                            "success": True,
-                            "result": data
-                        })
-                else:
-                    if connection:
-                        connection.send_error(msg["id"], "api_error", f"API error: {response.status}")
-    except ClientError as e:
-        _LOGGER.error("API request failed: %s", e)
+    # Use the API client to check the license plate
+    result = await api_client.check_license_plate(plate)
+
+    if result["success"]:
+        _LOGGER.debug("CampingCareHA: License plate %s is valid: %s", plate, result["data"])
         if connection:
-            connection.send_error(msg["id"], "api_exception", str(e))
+            connection.send_message({
+                "id": msg["id"],
+                "type": "result",
+                "success": True,
+                "result": result["data"]
+            })
+    else:
+        _LOGGER.error("CampingCareHA: License plate %s check failed: %s", plate, result["error"])
+        if connection:
+            connection.send_error(msg["id"], "api_error", result["error"])
+            
+# async def test_api_connection(url: str, api_key: str):
+#     """Test the API connection."""
+#     try:
+#         async with ClientSession() as session:
+#             async with session.get(f"{url}/version", headers={"Authorization": f"Bearer {api_key}"}) as response:
+#                 if response.status == 200:
+#                     _LOGGER.debug("CampingCareHA: API test successful.")
+#                     return True
+#                 _LOGGER.warning("CampingCareHA: API test returned status %s", response.status)
+#     except ClientError as e:
+#         _LOGGER.error("CampingCareHA: API test failed: %s", e)
+#     return False
+
+# async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):
+#     """Handle WebSocket license plate lookup."""
+#     plate = msg.get("plate")
+#     entry_id = msg.get("entry_id")
+    
+#     # Log the entry_id for debugging
+#     _LOGGER.debug("CampingCareHA: config entry id: %s", entry_id)
+#     _LOGGER.debug("CampingCareHA: WebSocket query_license_plate called with plate: %s", plate)
+
+#     if not plate or not entry_id or entry_id not in hass.data[DOMAIN]:
+#         if connection:
+#             connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "Missing or invalid plate/entry_id")
+#         return
+
+#     config = hass.data[DOMAIN][entry_id]
+#     url = config[CONF_API_URL]
+#     api_key = config[CONF_API_KEY]
+#     _LOGGER.debug("CampingCareHA: trying on %s with key %s ", url, api_key)
+
+#     try:
+#         async with ClientSession() as session:
+#             async with session.get(
+#                 f"{url}/license_plates/check_plate?plate={plate}",
+#                 headers={"Authorization": f"Bearer {api_key}"}
+#             ) as response:
+#                 _LOGGER.debug("CampingCareHA: response: %s", response)
+                
+#                 if response.status == 200:
+#                     data = await response.json()
+#                     _LOGGER.debug("CampingCareHA: response data: %s", data)
+#                     if connection:
+#                         connection.send_message({
+#                             "id": msg["id"],
+#                             "type": "result",
+#                             "success": True,
+#                             "result": data
+#                         })
+#                 else:
+#                     if connection:
+#                         connection.send_error(msg["id"], "api_error", f"API error: {response.status}")
+#     except ClientError as e:
+#         _LOGGER.error("API request failed: %s", e)
+#         if connection:
+#             connection.send_error(msg["id"], "api_exception", str(e))
