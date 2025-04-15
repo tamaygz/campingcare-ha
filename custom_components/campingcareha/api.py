@@ -30,9 +30,9 @@ class CampingCareAPI:
                     headers={"Authorization": f"Bearer {self.api_key}"}
                 ) as response:
                     if response.status == 200:
-                        data = await response.json()
-                        _LOGGER.debug("CampingCareAPI: Version request successful: %s", data)
-                        return data["version"]
+                        _version = await response.text()
+                        _LOGGER.debug("CampingCareAPI: Version request successful: %s", _version)
+                        return str(_version)
                     else:
                         _LOGGER.error("CampingCareAPI: API error: %s", response.status)
                         return None
