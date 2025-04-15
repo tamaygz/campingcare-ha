@@ -14,16 +14,6 @@ from aiohttp.web_exceptions import HTTPBadRequest
 
 _LOGGER = logging.getLogger(__name__)
 
-# Define configuration schema
-CONFIG_SCHEMA = vol.Schema(
-    {
-        vol.Required(CONF_NAME): cv.string,
-        vol.Required(CONF_API_KEY): cv.string,
-        vol.Required(CONF_API_URL): cv.url,
-    },
-    extra=vol.ALLOW_EXTRA,
-)
-
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up CampingCareHA integration from YAML (unused)."""
     _LOGGER.info("CampingCareHA: async_setup called — skipping YAML config.")
