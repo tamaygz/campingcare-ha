@@ -43,7 +43,7 @@ class CampingCareConfigFlow(ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
         """Return the options flow handler."""
-        return CampingCareOptionsFlowHandler(config_entry)
+        return CampingCareOptionsFlowHandler()
     
 class CampingCareOptionsFlowHandler(OptionsFlow):
     """Handle CampingCareHA options."""
