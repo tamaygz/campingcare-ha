@@ -2,7 +2,7 @@ import logging
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
-from .const import (DOMAIN, CONF_NAME, CONF_API_KEY, CONF_API_URL,)
+from .const import (DOMAIN, CONF_NAME, CONF_API_KEY, CONF_API_URL, DEFAULT_API_URL)
 
 
 # _LOGGER = logging.getLogger(__name__)
@@ -25,12 +25,13 @@ class CampingCareConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data=user_input,
             )
 
+
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
-                vol.Required(CONF_NAME): str,
-                vol.Required(CONF_API_URL): str,
-                vol.Required(CONF_API_KEY): str,
+            vol.Required(CONF_NAME): str,
+            vol.Required(CONF_API_URL, default=DEFAULT_API_URL): str,
+            vol.Required(CONF_API_KEY): str,
             }),
             errors=errors,
         )

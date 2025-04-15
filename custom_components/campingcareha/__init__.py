@@ -48,9 +48,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     websocket_api.async_register_command(
         hass,
         websocket_query_license_plate,
-        "campingcareha/query_license_plate"
+        f"{DOMAIN}/query_license_plate"
     )
 
+    return True
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Unload a config entry."""
+    hass.data[DOMAIN].pop(entry.entry_id, None)
+    _LOGGER.info("Unloaded CampingCareHA entry '%s'", entry.entry_id)
     return True
 
 async def test_api_connection(url: str, api_key: str):
@@ -59,11 +65,11 @@ async def test_api_connection(url: str, api_key: str):
         async with ClientSession() as session:
             async with session.get(f"{url}/v1/test", headers={"Authorization": f"Bearer {api_key}"}) as response:
                 if response.status == 200:
-                    _LOGGER.info("Successfully connected to CampingCare API")
+                    _LOGGER.debug("CampingCareHA: API test successful.")
                     return True
-                _LOGGER.warning("CampingCare API returned status %s", response.status)
+                _LOGGER.warning("CampingCareHA: API test returned status %s", response.status)
     except ClientError as e:
-        _LOGGER.error("Error connecting to CampingCare API: %s", e)
+        _LOGGER.error("CampingCareHA: API test failed: %s", e)
     return False
 
 async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):
@@ -75,9 +81,9 @@ async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):
         connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "Missing or invalid plate/entry_id")
         return
 
-    api_info = hass.data[DOMAIN][entry_id]
-    url = api_info[CONF_API_URL]
-    api_key = api_info[CONF_API_KEY]
+    config = hass.data[DOMAIN][entry_id]
+    url = config[CONF_API_URL]
+    api_key = config[CONF_API_KEY]
 
     try:
         async with ClientSession() as session:
