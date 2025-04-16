@@ -175,7 +175,7 @@ async def websocket_query_license_plate(hass: HomeAssistant, connection, msg):
 
     if not plate or not entry_id or entry_id not in hass.data[DOMAIN]:
         if connection:
-            connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "Missing or invalid plate/entry_id")
+            connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, translations["websocket.query_license_plate.error.missing_plate"])
         return
 
     # Retrieve the API client
