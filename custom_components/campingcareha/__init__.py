@@ -91,7 +91,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                     "result": result["data"],
                 }
             )
-            _LOGGER.info("CampingCareHA: Plate %s is valid: %s", plate, result["data"])
+            _LOGGER.info("CampingCareHA: Plate %s is known.", plate)
+            # _LOGGER.info("CampingCareHA: Plate %s is valid: %s", plate, result["data"])
         else:
             _LOGGER.warning("CampingCareHA: Plate %s check failed: %s", plate, result["error"])
     

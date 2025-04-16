@@ -72,7 +72,7 @@ class CampingCareAPI:
                 ) as response:
                     if response.status == 200:
                         data = await response.json()
-                        _LOGGER.debug("CampingCareAPI: License plate search successful: %s", data)
+                        # _LOGGER.debug("CampingCareAPI: License plate search successful: %s", data)
                         
                         # Check if the response is a list
                         if isinstance(data, list):
