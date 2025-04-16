@@ -77,6 +77,10 @@ class CampingCareAPI:
                         # Check if the response is a list
                         if isinstance(data, list):
                             if len(data) > 0:
+                                for item in data:
+                                    _LOGGER.info("Reservation found: Kategorie: %s, Platznummer: %s", 
+                                                 item.get("reservation", {}).get("accommodation", {}).get("name", "Unknown"), 
+                                                 item.get("reservation", {}).get("place", {}).get("name", "Unknown"))
                                 return {"success": True, "data": data}
                             else:
                                 _LOGGER.warning("CampingCareAPI: No reservation found for plate: %s", plate)
