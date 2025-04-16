@@ -95,7 +95,41 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         else:
             _LOGGER.warning("CampingCareHA: Plate %s check failed: %s", plate, result["error"])
     
+        async def handle_get_reservation(call: ServiceCall):
+            """Handle the get_reservation service."""
+            reservation_id = call.data.get("reservation_id")
+            entry_id = list(hass.data[DOMAIN].keys())[0] if hass.data[DOMAIN] else None
+        
+            if not entry_id:
+                _LOGGER.error("No valid CampingCareHA entry found.")
+                return
+        
+            api_client = hass.data[DOMAIN][entry_id]["api_client"]
+            result = await api_client.get_reservation(reservation_id)
+        
+            if result["success"]:
+                hass.bus.async_fire(
+                    f"{DOMAIN}_get_reservation",
+                    {
+                        "entry_id": entry_id,
+                        "reservation_id": reservation_id,
+                        "result": result["data"],
+                    }
+                )
+                _LOGGER.info("CampingCareHA: Reservation %s retrieved successfully: %s", reservation_id, result["data"])
+            else:
+                _LOGGER.warning("CampingCareHA: Failed to retrieve reservation %s: %s", reservation_id, result["error"])
+    
     # Register the services
+    hass.services.async_register(
+        domain="campingcareha",
+        service="get_reservation",
+        service_func=handle_get_reservation,
+        schema=vol.Schema({
+            vol.Required("reservation_id"): str,
+        }),
+    )
+
     hass.services.async_register(
         domain="campingcareha",
         service="check_plate",

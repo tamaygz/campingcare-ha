@@ -95,3 +95,27 @@ class CampingCareAPI:
         except ClientError as e:
             _LOGGER.error("CampingCareAPI: API request failed: %s", e)
             return {"success": False, "error": str(e)}
+        
+        async def get_reservation(self, reservation_id: str) -> dict:
+            """Retrieve a reservation by its ID."""
+            try:
+                async with ClientSession() as session:
+                    # Construct the endpoint with the reservation ID
+                    endpoint = f"{self.api_url}{ApiEndpoints.GET_RESERVATION.format(id=reservation_id)}"
+                    async with session.get(
+                        endpoint,
+                        headers={"Authorization": f"Bearer {self.api_key}"}
+                    ) as response:
+                        if response.status == 200:
+                            data = await response.json()
+                            _LOGGER.debug("CampingCareAPI: Reservation retrieval successful: %s", data)
+                            return {"success": True, "data": data}
+                        elif response.status == 404:
+                            _LOGGER.warning("CampingCareAPI: Reservation with ID %s not found.", reservation_id)
+                            return {"success": False, "error": "Reservation not found"}
+                        else:
+                            _LOGGER.error("CampingCareAPI: API error: %s", response.status)
+                            return {"success": False, "error": f"API error: {response.status}"}
+            except ClientError as e:
+                _LOGGER.error("CampingCareAPI: API request failed: %s", e)
+                return {"success": False, "error": str(e)}
