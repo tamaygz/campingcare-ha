@@ -22,8 +22,6 @@ class ApiQuery(StrEnum):
     PLATE = "plate={plate}"  # Query parameter for license plate
     LICENSE_PLATE = "license_plate={plate}"  # Query parameter for license plate in search
     ID = "/{id}"  # Placeholder for ID in URL
-    START_DATE = "start_date={start_date}"  # Query parameter for start date
-    END_DATE = "end_date={end_date}"  # Query parameter for end date
 
 class ApiEndpoints(StrEnum):
     """API endpoints for Camping Care."""

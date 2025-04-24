@@ -60,19 +60,12 @@ class CampingCareAPI:
             _LOGGER.error("CampingCareAPI: API request failed: %s", e)
             return {"success": False, "error": str(e)}
         
-    async def query_license_plate(self, plate: str, start_date: str = None, end_date: str = None) -> dict:
+    async def query_license_plate(self, plate: str) -> dict:
         """Search for a license plate and retrieve the associated reservation."""
         try:
             async with ClientSession() as session:
                 # Construct the endpoint with query parameters
                 endpoint = f"{self.api_url}{ApiEndpoints.FIND_LICENSE_PLATE_AND_GET_RESERVATION.format(plate=plate)}"
-                
-                # Add optional query parameters for start_date and end_date
-                if start_date:
-                    endpoint += f"&{ApiQuery.START_DATE}={start_date}"
-                if end_date:
-                    endpoint += f"&{ApiQuery.END_DATE}={end_date}"
-                
                 async with session.get(
                     endpoint,
                     headers={"Authorization": f"Bearer {self.api_key}"}

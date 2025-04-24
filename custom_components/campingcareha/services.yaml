@@ -21,15 +21,3 @@ query_plate:
       example: AB123CD
       selector:
         text:
-
-get_reservation:
-  name: Get Reservation
-  description: Retrieve reservation details using the CampingCare API.
-  fields:
-    reservation_id:
-      name: Reservation ID
-      description: The ID of the reservation to retrieve.
-      required: true
-      example: 12345
-      selector:
-        text:
