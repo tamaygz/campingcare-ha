@@ -130,26 +130,3 @@ class CampingCareAPI:
         except ClientError as e:
             _LOGGER.error("CampingCareAPI: API request failed: %s", e)
             return {"success": False, "error": str(e)}
-
-    async def get_places(self) -> list:
-        """Retrieve the list of places."""
-        try:
-            async with ClientSession() as session:
-                endpoint = f"{self.api_url}{ApiEndpoints.GET_PLACES}"
-                async with session.get(
-                    endpoint,
-                    headers={"Authorization": f"Bearer {self.api_key}"}
-                ) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        _LOGGER.debug("CampingCareAPI: Places retrieval successful: %s", data)
-                        return data
-                    elif response.status == 404:
-                        _LOGGER.warning("CampingCareAPI: No places found.")
-                        return []
-                    else:
-                        _LOGGER.error("CampingCareAPI: API error: %s", response.status)
-                        return []
-        except ClientError as e:
-            _LOGGER.error("CampingCareAPI: API request failed: %s", e)
-            return []

@@ -15,7 +15,6 @@ class ApiTopics(StrEnum):
     """API topics for Camping Care."""
     LICENSE_PLATES = "/license_plates"  # Base path for license plate related endpoints
     RESERVATIONS = "/reservations"  # Base path for reservation related endpoints
-    PLACES = "/places"  # Base path for places related endpoints
     VERSION = "/version"  # Base path for version related endpoints
 
 class ApiQuery(StrEnum):
@@ -35,10 +34,6 @@ class ApiEndpoints(StrEnum):
     #RESERVATIONS
     GET_RESERVATION = ApiTopics.RESERVATIONS + ApiQuery.ID  # Get reservation details by ID
 
-    #PLACES
-    GET_PLACES = ApiTopics.PLACES  # Endpoint to retrieve the list of places
-    
     #API
     GET_API_VERSION = ApiTopics.VERSION  # Get the API version
-
 

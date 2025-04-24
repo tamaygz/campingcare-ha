@@ -8,7 +8,6 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.components import websocket_api
 from homeassistant.helpers.event import async_call_later  # Import async_call_later directly
 from homeassistant.helpers.translation import async_get_translations
-from homeassistant.helpers.entity import Entity
 
 from .const import DOMAIN, CONF_API_KEY, CONF_API_URL, CONF_NAME
 from .api import CampingCareAPI
@@ -18,46 +17,6 @@ from aiohttp import ClientError, ClientConnectionError, ClientSession, InvalidUR
 from aiohttp.web_exceptions import HTTPBadRequest
 
 _LOGGER = logging.getLogger(__name__)
-
-class CampingCarePlaceSensor(Entity):
-    """Representation of a CampingCare Place Sensor."""
-
-    def __init__(self, hass, api_client, place):
-        self.hass = hass
-        self.api_client = api_client
-        self.place = place
-        self._name = f"Place {place['id']}"
-        self._state = None
-        self._attributes = {
-            "reservation_id": place.get("reservation_id"),
-            "license_plate": place.get("license_plate"),
-            "customer": place.get("customer"),
-        }
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def state(self):
-        return self._state
-
-    @property
-    def extra_state_attributes(self):
-        return self._attributes
-
-    async def async_update(self):
-        """Fetch new state data for the sensor."""
-        try:
-            place_data = await self.api_client.get_place(self.place['id'])
-            self._state = place_data.get("in_use", False)
-            self._attributes.update({
-                "reservation_id": place_data.get("reservation_id"),
-                "license_plate": place_data.get("license_plate"),
-                "customer": place_data.get("customer"),
-            })
-        except Exception as e:
-            _LOGGER.error("Failed to update place sensor: %s", e)
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the CampingCare integration."""
@@ -96,7 +55,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
 
     # Fetch translations for error messages
-    translations = await async_get_translations(hass, "en", "component")
+    translations = await async_get_translations(hass, "en")
 
     async def handle_check_plate(call: ServiceCall):
         """Handle the check_plate service."""
@@ -196,12 +155,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             vol.Optional("end_date"): str,
         }),
     )
-
-    # Fetch places and create sensors
-    places = await api_client.get_places()
-    for place in places:
-        sensor = CampingCarePlaceSensor(hass, api_client, place)
-        hass.helpers.entity_platform.async_add_entities([sensor])
 
     return True
 
