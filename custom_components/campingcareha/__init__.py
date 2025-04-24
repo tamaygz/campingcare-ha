@@ -7,7 +7,6 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.components import websocket_api
 from homeassistant.helpers.event import async_call_later  # Import async_call_later directly
-from homeassistant.helpers.translation import async_get_translations
 
 from .const import DOMAIN, CONF_API_KEY, CONF_API_URL, CONF_NAME
 from .api import CampingCareAPI
@@ -54,25 +53,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         f"{DOMAIN}/query_license_plate"
     )
 
-    # Fetch translations for error messages
-    translations = await async_get_translations(hass, "en")
-
     async def handle_check_plate(call: ServiceCall):
         """Handle the check_plate service."""
         plate = call.data.get("plate")
         entry_id = list(hass.data[DOMAIN].keys())[0] if hass.data[DOMAIN] else None
 
         if not entry_id:
-            _LOGGER.error(translations["errors.api_connection_failed"])
+            _LOGGER.error("No valid CampingCareHA entry found.")
             return
 
         api_client = hass.data[DOMAIN][entry_id]["api_client"]
         result = await api_client.check_license_plate(plate)
 
         if result["success"]:
-            _LOGGER.info(translations["service.query_plate.description"], plate, result["data"])
+            _LOGGER.info("CampingCareHA: Plate %s is valid: %s", plate, result["data"])
         else:
-            _LOGGER.warning(translations["errors.invalid_license_plate"], plate, result["error"])
+            _LOGGER.warning("CampingCareHA: Plate %s check failed: %s", plate, result["error"])
     
     async def handle_query_plate(call: ServiceCall):
         """Handle the query_plate service."""
@@ -80,7 +76,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         entry_id = list(hass.data[DOMAIN].keys())[0] if hass.data[DOMAIN] else None
 
         if not entry_id:
-            _LOGGER.error(translations["errors.api_connection_failed"])
+            _LOGGER.error("No valid CampingCareHA entry found.")
             return
 
         api_client = hass.data[DOMAIN][entry_id]["api_client"]
@@ -97,9 +93,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                     "result": result["data"],
                 }
             )
-            _LOGGER.info(translations["websocket.query_license_plate.description"], plate)
+            _LOGGER.info("CampingCareHA: Plate %s is known.", plate)
+            # _LOGGER.info("CampingCareHA: Plate %s is valid: %s", plate, result["data"])
         else:
-            _LOGGER.warning(translations["errors.api_request_failed"], plate, result["error"])
+            _LOGGER.warning("CampingCareHA: Plate %s check failed: %s", plate, result["error"])
     
     async def handle_get_reservation(call: ServiceCall):
         """Handle the get_reservation service."""
@@ -107,7 +104,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         entry_id = list(hass.data[DOMAIN].keys())[0] if hass.data[DOMAIN] else None
     
         if not entry_id:
-            _LOGGER.error(translations["errors.api_connection_failed"])
+            _LOGGER.error("No valid CampingCareHA entry found.")
             return
     
         api_client = hass.data[DOMAIN][entry_id]["api_client"]
@@ -122,14 +119,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                     "result": result["data"],
                 }
             )
-            _LOGGER.info(translations["service.query_plate.description"], reservation_id, result["data"])
+            _LOGGER.info("CampingCareHA: Reservation %s retrieved successfully: %s", reservation_id, result["data"])
         else:
-            _LOGGER.warning(translations["errors.api_request_failed"], reservation_id, result["error"])
+            _LOGGER.warning("CampingCareHA: Failed to retrieve reservation %s: %s", reservation_id, result["error"])
 
-    # Register the services for this specific instance
+    # Register the services
     hass.services.async_register(
-        domain=DOMAIN,
-        service=f"{entry.entry_id}_get_reservation",
+        domain="campingcareha",
+        service="get_reservation",
         service_func=handle_get_reservation,
         schema=vol.Schema({
             vol.Required("reservation_id"): str,
@@ -137,8 +134,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
 
     hass.services.async_register(
-        domain=DOMAIN,
-        service=f"{entry.entry_id}_check_plate",
+        domain="campingcareha",
+        service="check_plate",
         service_func=handle_check_plate,
         schema=vol.Schema({
             vol.Required("plate"): str,
@@ -146,8 +143,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
 
     hass.services.async_register(
-        domain=DOMAIN,
-        service=f"{entry.entry_id}_query_plate",
+        domain="campingcareha",
+        service="query_plate",
         service_func=handle_query_plate,
         schema=vol.Schema({
             vol.Required("plate"): str,
