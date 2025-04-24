@@ -80,9 +80,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             return
 
         api_client = hass.data[DOMAIN][entry_id]["api_client"]
-        start_date = call.data.get("start_date")
-        end_date = call.data.get("end_date")
-        result = await api_client.query_license_plate(plate, start_date=start_date, end_date=end_date)
+        result = await api_client.query_license_plate(plate)
 
         if result["success"]:
             hass.bus.async_fire(
@@ -148,8 +146,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         service_func=handle_query_plate,
         schema=vol.Schema({
             vol.Required("plate"): str,
-            vol.Optional("start_date"): str,
-            vol.Optional("end_date"): str,
         }),
     )
 

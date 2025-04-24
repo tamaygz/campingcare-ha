@@ -21,20 +21,6 @@ query_plate:
       example: AB123CD
       selector:
         text:
-    start_date:
-      name: Start Date
-      description: The start date for the query (optional).
-      required: false
-      example: 2025-01-01
-      selector:
-      text:
-    end_date:
-      name: End Date
-      description: The end date for the query (optional).
-      required: false
-      example: 2025-01-10
-      selector:
-      text:
 
 get_reservation:
   name: Get Reservation
