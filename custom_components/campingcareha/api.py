@@ -104,7 +104,7 @@ class CampingCareAPI:
                         _LOGGER.error("CampingCareAPI: API error: %s", response.status)
                         return {"success": False, "error": f"API error: {response.status}"}
         except ClientError as e:
-            _LOGGER.error(translations["errors.api_connection_failed"], e)
+            _LOGGER.error("CampingCareAPI: API request failed: %s", e)
             return {"success": False, "error": str(e)}
         
     async def get_reservation(self, reservation_id: str) -> dict:

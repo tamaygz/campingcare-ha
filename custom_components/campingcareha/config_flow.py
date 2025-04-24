@@ -75,6 +75,5 @@ class CampingCareOptionsFlowHandler(OptionsFlow):
                 vol.Required(CONF_NAME, default=name): str,
                 vol.Required(CONF_API_URL, default=api_url): str,
                 vol.Required(CONF_API_KEY, default=api_key): str,
-            }),
-            errors={"base": translations["errors.api_connection_failed"]},
+            })
         )
